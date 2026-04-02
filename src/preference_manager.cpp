@@ -13,14 +13,18 @@ void PreferencesManager::saveAll() {
   prefs.putInt("deadzone", deadzone);
   prefs.putFloat("expo", expoCurve);
   prefs.putInt("maxout", maxOutput);
-  prefs.putInt("centerX", centerX);
-  prefs.putInt("centerY", centerY);
+  prefs.putInt("centerLX", centerLX);
+  prefs.putInt("centerLY", centerLY);
+  prefs.putInt("centerRX", centerRX);
+  prefs.putInt("centerRY", centerRY);
 }
 
 void PreferencesManager::loadAll() {
   deadzone = prefs.getInt("deadzone", DEFAULT_DEADZONE);
   expoCurve = prefs.getFloat("expo", DEFAULT_EXPO_CURVE);
   maxOutput = prefs.getInt("maxout", DEFAULT_MAX_OUTPUT);
-  centerX = prefs.getInt("centerX", 2048);
-  centerY = prefs.getInt("centerY", 2048);
+  centerLX = prefs.getInt("centerLX", 2048);
+  centerLY = prefs.getInt("centerLY", 2048);
+  centerRX = prefs.getInt("centerRX", 2048);
+  centerRY = prefs.getInt("centerRY", 2048);
 }

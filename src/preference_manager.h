@@ -9,8 +9,10 @@ public:
     int deadzone;
     float expoCurve;
     int maxOutput;
-    int centerX;
-    int centerY;
+    int centerLX;
+    int centerLY;
+    int centerRX;
+    int centerRY;
 
     // Constructor
     PreferencesManager();

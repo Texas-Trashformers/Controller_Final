@@ -5,5 +5,5 @@ struct ControlPacket {
   int8_t vx;
   int8_t vy;
   int8_t omega;
-  uint8_t mask;
+  uint16_t mask;  // Expanded to 16 bits for 12 buttons
 };
