@@ -1,6 +1,5 @@
 #pragma once
 #include <Arduino.h>
-#include <Ticker.h>
 
 struct InputState {
     int8_t lx;      // Left joystick X
@@ -15,7 +14,6 @@ struct InputState {
 };
 
 extern InputState inputs;
-extern Ticker inputTimer;
 
 void inputs_setup();
-void updateInputs();
+void calibrateRightJoystick();

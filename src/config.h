@@ -34,7 +34,7 @@
 // Preferences
 #define DEFAULT_DEADZONE 50
 #define DEFAULT_EXPO_CURVE 1.5f
-#define DEFAULT_MAX_OUTPUT 127
+#define DEFAULT_MAX_OUTPUT 100
 
 // Debug
 #define SERIAL_DEBUG

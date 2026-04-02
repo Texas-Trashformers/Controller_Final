@@ -13,6 +13,10 @@ public:
     int centerLY;
     int centerRX;
     int centerRY;
+    int minRX;
+    int maxRX;
+    int minRY;
+    int maxRY;
 
     // Constructor
     PreferencesManager();
@@ -24,3 +28,6 @@ public:
 private:
     Preferences prefs; // The actual Preferences object
 };
+
+// Global preferences instance
+extern PreferencesManager prefs;
