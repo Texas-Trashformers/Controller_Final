@@ -4,7 +4,7 @@
 #include "inputs.h"
 #include "button_manager.h"
 #include "preference_manager.h"
-// #include "comm.h"
+#include "comm.h"
 
 
 void setup() {
@@ -61,7 +61,8 @@ void setup() {
   Serial.println("   ButtonManager ready.");
   Serial.flush();
 
-  Serial.println("[6/6] Skipping comm_setup() for stability test.");
+  Serial.println("[6/6] Initializing ESP-NOW comm...");
+  comm_setup();
   Serial.println("\n=== SETUP COMPLETE ===");
   Serial.flush();
 
@@ -96,6 +97,9 @@ void loop() {
     calibTriggered = false;
   }
 
+  // Send control packet at 50Hz (watchdog requires ≤200ms between packets)
+  sendControlPacket();
+
   // Display update: rate-limited to 50ms — inputs struct is kept fresh by Core 0 task
   if (millis() - lastDraw >= 50) {
     lastDraw = millis();
@@ -104,12 +108,17 @@ void loop() {
 
   // Serial status every 2 seconds
   if (millis() - lastStatus >= 2000) {
-    Serial.printf("[DEBUG] Loop #%lu | Heap:%d | Millis:%lu | Btns: ",
-                  loopCount, ESP.getFreeHeap(), millis());
-    for (int i = 0; i < 10; i++) {
-      Serial.print(inputs.buttons[i] ? "1" : "0");
-    }
-    Serial.println();
+    int rawRX = analogRead(JOY_R_HORIZONTAL);
+    int rawRY = analogRead(JOY_R_VERTICAL);
+    Serial.printf("[RAW] RX=%4d  RY=%4d\n", rawRX, rawRY);
+    Serial.printf("[CAL] RX: %d .. %d .. %d   RY: %d .. %d .. %d\n",
+                  prefs.minRX, prefs.centerRX, prefs.maxRX,
+                  prefs.minRY, prefs.centerRY, prefs.maxRY);
+    Serial.printf("[OUT] rx=%+d  ry=%+d  maxOut=%d  dz=%d\n",
+                  inputs.rx, inputs.ry, prefs.maxOutput, prefs.deadzone);
+    Serial.printf("[BTN] ");
+    for (int i = 0; i < 10; i++) Serial.print(inputs.buttons[i] ? "1" : "0");
+    Serial.printf("  heap=%d\n", ESP.getFreeHeap());
     Serial.flush();
     lastStatus = millis();
   }

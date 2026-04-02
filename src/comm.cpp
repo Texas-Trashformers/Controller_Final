@@ -2,7 +2,6 @@
 #include "comm.h"
 
 static uint32_t lastSendTime = 0;
-static ControlPacket lastSentPacket = {0};
 bool espNowTxOk = false;
 ESPNowSender espNowSender;
 
@@ -10,23 +9,26 @@ void comm_setup() {
   espNowSender.begin();
 }
 
+// Button → mask bit assignments
+//   buttons[8] SHOULDER_1 → ROT_MODE_BIT (matches "ROT" display indicator)
+//   buttons[9] SHOULDER_2 → SLOW_BIT
+//   FAST_BIT: unmapped until a dedicated button is wired
+
 void sendControlPacket() {
   uint32_t now = millis();
-  if (now - lastSendTime < 25) return;   // min 40 Hz
+  if (now - lastSendTime < 20) return;  // 50 Hz — ChassisBrain watchdog requires ≤200ms
+  lastSendTime = now;
 
-  ControlPacket pkt = {0};
-  pkt.vx = inputs.lx;
-  pkt.vy = inputs.ly;
+  ControlPacket pkt = {};
+
+  // Right joystick drives movement (left joystick not yet soldered)
+  pkt.vx    = inputs.rx;
+  pkt.vy    = inputs.ry;
   pkt.omega = inputs.omega;
-  pkt.mask = 0;
-  for (int i = 0; i < 10; i++) {
-    if (inputs.buttons[i]) pkt.mask |= (1U << i);
-  }
-  // Add joystick select buttons to mask (bits 10-11)
-  if (inputs.joySelect[0]) pkt.mask |= (1U << 10);
-  if (inputs.joySelect[1]) pkt.mask |= (1U << 11);
+
+  // Mask bits
+  if (inputs.buttons[8]) pkt.mask |= (1 << ROT_MODE_BIT);  // SHOULDER_1 → rotate only
+  if (inputs.buttons[9]) pkt.mask |= (1 << SLOW_BIT);       // SHOULDER_2 → slow mode
 
   espNowSender.send(pkt);
-  lastSentPacket = pkt;
-  lastSendTime = now;
 }

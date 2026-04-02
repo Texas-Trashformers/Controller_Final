@@ -19,11 +19,16 @@ static int8_t applyAxis(int raw, int center, int minVal, int maxVal) {
     ? (float)(maxVal - center)
     : (float)(center - minVal);
 
-  if (range < 1.0f) return 0;  // Uncalibrated or degenerate — skip
+  if (range < 1.0f) return 0;  // Uncalibrated or degenerate
+
+  // Guard: if range ≤ deadzone the denominator would be zero or negative,
+  // producing +inf or a negative norm (→ constrained to 1.0 or 0.0 = stuck
+  // at max or stuck at zero).  Return 0 until re-calibrated with wider travel.
+  float denom = range - (float)prefs.deadzone;
+  if (denom <= 0.0f) return 0;
 
   // Normalize [deadzone..range] → [0..1], apply expo curve
-  float norm = (float)(abs(deviation) - prefs.deadzone) / (range - prefs.deadzone);
-  norm = constrain(norm, 0.0f, 1.0f);
+  float norm = constrain((float)(abs(deviation) - prefs.deadzone) / denom, 0.0f, 1.0f);
   float curved = pow(norm, prefs.expoCurve) * (float)prefs.maxOutput;
 
   return (deviation > 0) ? (int8_t)curved : (int8_t)-curved;
@@ -35,8 +40,8 @@ static void inputSamplingTask(void* pvParameters) {
     // Right Joystick (SOLDERED)
     int rawRX = analogRead(JOY_R_HORIZONTAL);
     int rawRY = analogRead(JOY_R_VERTICAL);
-    inputs.rx =  applyAxis(rawRX, prefs.centerRX, prefs.minRX, prefs.maxRX);
-    inputs.ry = -applyAxis(rawRY, prefs.centerRY, prefs.minRY, prefs.maxRY); // Invert Y
+    inputs.rx = -applyAxis(rawRX, prefs.centerRX, prefs.minRX, prefs.maxRX);
+    inputs.ry =  applyAxis(rawRY, prefs.centerRY, prefs.minRY, prefs.maxRY);
 
     // Left joystick disabled (not yet soldered)
     inputs.lx = 0;

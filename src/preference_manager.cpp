@@ -29,7 +29,7 @@ void PreferencesManager::saveAll() {
 void PreferencesManager::loadAll() {
   deadzone = prefs.getInt("deadzone", DEFAULT_DEADZONE);
   expoCurve = prefs.getFloat("expo", DEFAULT_EXPO_CURVE);
-  maxOutput = prefs.getInt("maxout", DEFAULT_MAX_OUTPUT);
+  maxOutput = DEFAULT_MAX_OUTPUT;  // Always use the compile-time default (ignores stale NVS)
   centerLX = prefs.getInt("centerLX", 2048);
   centerLY = prefs.getInt("centerLY", 2048);
   centerRX = prefs.getInt("centerRX", 2048);
